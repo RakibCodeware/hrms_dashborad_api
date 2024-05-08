@@ -47,4 +47,5 @@ C:\Users\CW\Documents\Hrms_api\Hrms_api\obj\Release\net8.0\PubTmp\Out\runtimes\w
 C:\Users\CW\Documents\Hrms_api\Hrms_api\obj\Release\net8.0\PubTmp\Out\runtimes\win\lib\net6.0\System.Runtime.Caching.dll
 C:\Users\CW\Documents\Hrms_api\Hrms_api\obj\Release\net8.0\PubTmp\Out\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll
 C:\Users\CW\Documents\Hrms_api\Hrms_api\obj\Release\net8.0\PubTmp\Out\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
+C:\Users\CW\Documents\Hrms_api\Hrms_api\obj\Release\net8.0\PubTmp\Out\ComplexScriptingSystem.dll
 C:\Users\CW\Documents\Hrms_api\Hrms_api\obj\Release\net8.0\PubTmp\Out\Hrms_api.deps.json

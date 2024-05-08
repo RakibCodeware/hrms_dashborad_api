@@ -135,3 +135,5 @@ C:\Users\CW\Documents\Hrms_api\Hrms_api\obj\Release\net8.0\Hrms_api.pdb
 C:\Users\CW\Documents\Hrms_api\Hrms_api\obj\Release\net8.0\Hrms_api.genruntimeconfig.cache
 C:\Users\CW\Documents\Hrms_api\Hrms_api\obj\Release\net8.0\ref\Hrms_api.dll
 C:\Users\CW\Documents\Hrms_api\Hrms_api\bin\Release\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\CW\Documents\Hrms_api\Hrms_api\obj\Release\net8.0\Hrms_api.sourcelink.json
+C:\Users\CW\Documents\Hrms_api\Hrms_api\bin\Release\net8.0\ComplexScriptingSystem.dll

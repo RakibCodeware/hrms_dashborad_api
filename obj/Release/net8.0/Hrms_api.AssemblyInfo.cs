@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Hrms_api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f6bb6c89515612f2d5fe3a63a85dc84a5f3f0398")]
 [assembly: System.Reflection.AssemblyProductAttribute("Hrms_api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Hrms_api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
