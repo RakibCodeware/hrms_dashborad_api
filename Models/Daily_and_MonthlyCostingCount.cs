@@ -2,15 +2,15 @@
 {
     public class Daily_and_MonthlyCostingCount
     {
-        public double? DailySalaryAmnt {  get; set; }
-        public string DailyOTPay { get; set; }
+        public string? DailySalaryAmnt {  get; set; }
+      
    
     }
 
     public class MonthlyCosting()
     {
-        public double MonthlyPaySalaryamnt { get; set; }
-        public double MonthlyOTPay { get; set; }
-        public double ExtraOtAmnt { get; set; }
+        public string MonthlyPaySalaryamnt { get; set; }
+        public string MonthlyOTPay { get; set; }
+        //public string ExtraOtAmnt { get; set; }
     }
 }

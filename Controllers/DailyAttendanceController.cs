@@ -18,6 +18,8 @@ namespace Hrms_api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
+
    
 
 
@@ -117,6 +119,7 @@ namespace Hrms_api.Controllers
                             .Select(g => new AttendanceSummery
                             {
                                 Total = g.Count(),
+                                TotalPerc=100,
                                 Leave = g.Sum(x => x.Attstatus == "lv" ? 1 : 0),
                                 Late = g.Sum(x => x.Attstatus == "l" ? 1 : 0),
                                 Present = g.Sum(x => x.Attstatus == "l" || x.Attstatus == "p" ? 1 : 0),
@@ -124,7 +127,10 @@ namespace Hrms_api.Controllers
                                 LeavePers = 0,
                                 absentRatio = 0,
                                 lateRatio = 0,
-                                PressentRatio = 0
+                                PressentRatio = 0,
+                                OffDayDuty="N/A",
+                                OffDayDutyPerc="0"
+                                
                             })
                             .FirstOrDefault();
 
@@ -144,7 +150,7 @@ namespace Hrms_api.Controllers
                         }
                         else
                         {
-                            List<AttendanceSummery> resultList = dataNotFound();
+                            var resultList = dataNotFound();
                             return Ok(resultList);
                         }
                        
@@ -423,8 +429,10 @@ namespace Hrms_api.Controllers
                         {
                             dailyCostingCount.Add(new Daily_and_MonthlyCostingCount
                             {
-                                DailySalaryAmnt = reader.GetDouble(0),
-                                DailyOTPay = "0"
+                                DailySalaryAmnt =reader.IsDBNull(0) ? "0":Math.Round(reader.GetDouble(0)).ToString("#,##,##,##0", new System.Globalization.CultureInfo("en-IN"))
+
+
+                                
                             });
                         }
 
@@ -439,7 +447,7 @@ namespace Hrms_api.Controllers
 
                     else
                     {
-                        return Ok(new { Status = "404", Message = "Data Not Found" });
+                        return Ok(new { DailySalaryAmnt=0 });
                     }
 
                 }
@@ -475,7 +483,7 @@ namespace Hrms_api.Controllers
                     {
                         DataTable dt = new DataTable();
 
-                        string query = "SELECT ISNULL(SUM(ROUND(NetPayable, 0)), 0) AS TotalSalary, ISNULL(SUM(ROUND(OverTimeAmount, 0)), 0) AS OverTimeAmount, ISNULL(SUM(ROUND(TotalOTAmount, 0) - ROUND(OverTimeAmount, 0)), 0) AS ExtraOTAmount FROM Payroll_MonthlySalarySheet WHERE YearMonth = @Date AND CompanyId = @companyId";
+                        string query = "SELECT ISNULL(SUM(ROUND(NetPayable, 0)), 0) AS TotalSalary, ISNULL(SUM(ROUND(TotalOTAmount, 0)), 0) AS TotalOTAmount, ISNULL(SUM(ROUND(TotalOTAmount, 0) - ROUND(OverTimeAmount, 0)), 0) AS ExtraOTAmount FROM Payroll_MonthlySalarySheet WHERE YearMonth = @Date AND CompanyId = @companyId";
                         List<MonthlyCosting> monthlyCostingAmnt = new List<MonthlyCosting>();
 
                         using (SqlCommand cmd = new SqlCommand(query, connection))
@@ -491,9 +499,8 @@ namespace Hrms_api.Controllers
                                 {
                                     monthlyCostingAmnt.Add(new MonthlyCosting
                                     {
-                                        MonthlyPaySalaryamnt = reader.GetDouble(0),
-                                        ExtraOtAmnt = reader.GetDouble(1),
-                                        MonthlyOTPay = reader.GetDouble(2)
+                                        MonthlyPaySalaryamnt = reader.IsDBNull(0) ? "0" :Math.Round(reader.GetDouble(0)).ToString("#,##,##,##0", new System.Globalization.CultureInfo("en-IN")),
+                                        MonthlyOTPay = reader.IsDBNull(0) ? "0" :Math.Round(reader.GetDouble(1)).ToString("#,##,##,##0", new System.Globalization.CultureInfo("en-IN"))
                                     });
                                 }
                             }
@@ -670,7 +677,7 @@ namespace Hrms_api.Controllers
 
                      else
                     {
-                        return Ok(new { Status = "404", Message = "Data Not Found" });
+                        return Ok(new { NewJoin =0, Release =0});
                     }
 
                 }
@@ -689,7 +696,7 @@ namespace Hrms_api.Controllers
         [HttpGet]
         [Route("dailyOtCalculation")]
 
-        public IActionResult dailyOtCalculation(string date)
+        public IActionResult dailyOtCalculation(string date,string  companyId)
         {
             string todate = date;
             DateTime datetime = DateTime.Parse(date);
@@ -698,7 +705,7 @@ namespace Hrms_api.Controllers
             string Formadate = firstDayOfPreviousMonth.ToString("yyyy-MM-dd");
            
 
-            var results = overTimeCalculation(todate, todate);
+            var results = overTimeCalculation(todate, todate, companyId);
   
             return Ok(results);
         }
@@ -707,7 +714,7 @@ namespace Hrms_api.Controllers
         [HttpGet]
         [Route("monthlyOtCalculation")]
 
-        public IActionResult monthlyOtCalculation(string date)
+        public IActionResult monthlyOtCalculation(string date,string companyId)
         {
             string todate = date;
             DateTime datetime = DateTime.Parse(date);
@@ -716,7 +723,7 @@ namespace Hrms_api.Controllers
             string Formadate = firstDayOfPreviousMonth.ToString("yyyy-MM-dd");
 
 
-            var results = overTimeCalculation(Formadate, todate);
+            var results = overTimeCalculation(Formadate, todate, companyId);
            return Ok(results);
         }
 
@@ -724,7 +731,7 @@ namespace Hrms_api.Controllers
 
 
 
-        private object overTimeCalculation(string formdate, string todate)
+        private object overTimeCalculation(string formdate, string todate,string companyId)
         {
 
             try
@@ -732,7 +739,7 @@ namespace Hrms_api.Controllers
                 SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection").ToString());
                 DataTable dt = new DataTable();
                 string sSql = @"DECLARE @maxOT VARCHAR(8) = '02:00:00' 
-                                           Select att.Empid,cs.BasicSalary,  isnull(CAST(SUM(DATEDIFF(second, 0, case when ATTStatus='W' or ATTStatus='H' then '00:00:00' else case when TotalOverTime>@maxOT then  '02:0'+SUBSTRING(OutMin,2,1)+':'+OutSec else TotalOverTime end end)) / 3600 AS varchar(12)) + ':' + RIGHT('0' + CAST(SUM(DATEDIFF(second, 0, case when ATTStatus='W' or ATTStatus='H' then '00:00:00' else case when TotalOverTime>@maxOT then  '02:0'+SUBSTRING(OutMin,2,1)+':'+OutSec else TotalOverTime end end)) / 60 % 60 AS varchar(2)), 2) + ':' +RIGHT('0' + CAST(SUM(DATEDIFF(second, 0, case when ATTStatus='W' or ATTStatus='H' then '00:00:00' else case when TotalOverTime>@maxOT then  '02:0'+SUBSTRING(OutMin,2,1)+':'+OutSec else TotalOverTime end end)) % 60 AS varchar(2)), 2),'00:00:00') AS OverTime,isnull(CAST(SUM(DATEDIFF(second, 0, TotalOverTime)) / 3600 AS varchar(12)) + ':' + RIGHT('0' + CAST(SUM(DATEDIFF(second, 0, TotalOverTime)) / 60 % 60 AS varchar(2)), 2) + ':' +RIGHT('0' + CAST(SUM(DATEDIFF(second, 0, TotalOverTime)) % 60 AS varchar(2)), 2),'00:00:00') AS TotalOverTime from v_tblAttendanceRecord att left join Personnel_EmpCurrentStatus cs on att.EmpId=cs.EmpId and cs.IsActive=1 where  AttDate >='"+ formdate + "' AND AttDate <= '"+ todate + "'  and IsOverTime='1' and att.IsActive='1' group by  att.Empid,cs.BasicSalary";
+                                           Select att.Empid,cs.BasicSalary,  isnull(CAST(SUM(DATEDIFF(second, 0, case when ATTStatus='W' or ATTStatus='H' then '00:00:00' else case when TotalOverTime>@maxOT then  '02:0'+SUBSTRING(OutMin,2,1)+':'+OutSec else TotalOverTime end end)) / 3600 AS varchar(12)) + ':' + RIGHT('0' + CAST(SUM(DATEDIFF(second, 0, case when ATTStatus='W' or ATTStatus='H' then '00:00:00' else case when TotalOverTime>@maxOT then  '02:0'+SUBSTRING(OutMin,2,1)+':'+OutSec else TotalOverTime end end)) / 60 % 60 AS varchar(2)), 2) + ':' +RIGHT('0' + CAST(SUM(DATEDIFF(second, 0, case when ATTStatus='W' or ATTStatus='H' then '00:00:00' else case when TotalOverTime>@maxOT then  '02:0'+SUBSTRING(OutMin,2,1)+':'+OutSec else TotalOverTime end end)) % 60 AS varchar(2)), 2),'00:00:00') AS OverTime,isnull(CAST(SUM(DATEDIFF(second, 0, TotalOverTime)) / 3600 AS varchar(12)) + ':' + RIGHT('0' + CAST(SUM(DATEDIFF(second, 0, TotalOverTime)) / 60 % 60 AS varchar(2)), 2) + ':' +RIGHT('0' + CAST(SUM(DATEDIFF(second, 0, TotalOverTime)) % 60 AS varchar(2)), 2),'00:00:00') AS TotalOverTime from v_tblAttendanceRecord att left join Personnel_EmpCurrentStatus cs on att.EmpId=cs.EmpId and cs.IsActive=1 where  AttDate >='"+ formdate + "' AND AttDate <= '"+ todate + "' and  att.CompanyId='"+ companyId + "' and IsOverTime='1' and att.IsActive='1' group by  att.Empid,cs.BasicSalary";
 
                 List<DailyOverTimeCalculetion> dailyOvertimeCalculation = new List<DailyOverTimeCalculetion>();
 
@@ -778,7 +785,7 @@ namespace Hrms_api.Controllers
                 double extraOtAmnt = totalOtAmount - regularOTAmount;
                 double totalOtHour = totalOtAsSec / 3600;
                 double regularOtHour = regularOTAsSec / 3600;
-                double extraOtHour = extraOtSec / 36000;
+                double extraOtHour = extraOtSec / 3600;
 
                 if (formdate != todate)
                 {
@@ -792,7 +799,7 @@ namespace Hrms_api.Controllers
                      avgOtAmnt = Math.Round(totalOtAmount / daysDifference);
                 }
 
-                var result = new { regularOtHour = Math.Round(regularOtHour,2), extraOtHour =Math.Round(extraOtHour,2), totalOtHour =Math.Round(                totalOtHour,2), regularOTAmount = regularOTAmount, totalOtAmount = totalOtAmount, extraOtAmnt = extraOtAmnt,avgOtHour= avgOtHour,avgOtAmnt=avgOtAmnt };
+                var result = new { regularOtHour = Math.Round(regularOtHour,2), extraOtHour =Math.Round(extraOtHour,2), totalOtHour =Math.Round(                totalOtHour,2), regularOTAmount = regularOTAmount.ToString("#,##,##,##0", new System.Globalization.CultureInfo("en-IN")), totalOtAmount = totalOtAmount.ToString("#,##,##,##0", new System.Globalization.CultureInfo("en-IN")), extraOtAmnt = extraOtAmnt.ToString("#,##,##,##0", new System.Globalization.CultureInfo("en-IN")),avgOtHour= avgOtHour,avgOtAmnt=avgOtAmnt.ToString("#,##,##,##0", new System.Globalization.CultureInfo("en-IN")) };
 
                 return result;
             }
@@ -806,11 +813,12 @@ namespace Hrms_api.Controllers
         }
 
 
-        private List<AttendanceSummery> dataNotFound()
+        private object dataNotFound()
         {
-            AttendanceSummery attendanceSummery = new AttendanceSummery()
+            var result = new
             {
                 Total = 0,
+                TotalPer=0,
                 Present = 0,
                 Absent = 0,
                 Late = 0,
@@ -819,12 +827,11 @@ namespace Hrms_api.Controllers
                 absentRatio = 0,
                 LeavePers = 0,
                 lateRatio = 0,
+                OffDayDuty = "N/A",
+                OffDayDutyPerc = "0"
             };
 
-            List<AttendanceSummery> list = new List<AttendanceSummery>();
-            list.Add(attendanceSummery);
-
-            return list;
+            return result;
         }
 
 

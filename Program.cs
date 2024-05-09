@@ -13,7 +13,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowOrigins,
         policy =>
         {
-            policy.WithOrigins("https://localhost:44343","https://localhost:7034","https://localhost:7220", "http://cw-hrmrs.codehosting.xyz", "http://localhost:6166", "http://cw-hrms-api.codehosting.xyz")
+            policy.WithOrigins("https://localhost:44343","https://localhost:7034","https://localhost:7220", "http://cw-hrmrs.codehosting.xyz", "http://localhost:6166", "http://cw-hrms-api.codehosting.xyz", "http://cw-hrms.codehosting.xyz")
                                 .AllowAnyHeader()
                                 .AllowAnyMethod();
         });

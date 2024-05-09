@@ -11,6 +11,10 @@
         public decimal? lateRatio { get; set; }
         public decimal? LeavePers { get; set; }
         public decimal? Total { get; set;}
+        public decimal? TotalPerc { get; set; }
+
+        public string OffDayDuty {  get; set; }
+        public string OffDayDutyPerc { get; set; }
 
 
 
