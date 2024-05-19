@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "yfej49xbDwdmFH6dSACS+EixG0YdL4VeZSjRRD09ZhPc71uAkf+wD+s61+A4OeAE2nDdUtEQUNFDEoiIxX4zzQ==",
+  "dgSpecHash": "z50EpOm97QPUSkDSuUaPn2p5RycDe3mEGAh/Onnc2l0Yc5Dx2rVRC5p6GuuVAGiXnLz0U26ODmAu1rD/R6tgdA==",
   "success": true,
   "projectFilePath": "C:\\Users\\CW\\Documents\\Hrms_api\\Hrms_api\\Hrms_api.csproj",
   "expectedPackageFiles": [
@@ -8,6 +8,7 @@
     "C:\\Users\\CW\\.nuget\\packages\\azure.identity\\1.10.3\\azure.identity.1.10.3.nupkg.sha512",
     "C:\\Users\\CW\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\CW\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\8.0.4\\microsoft.aspnetcore.authentication.jwtbearer.8.0.4.nupkg.sha512",
+    "C:\\Users\\CW\\.nuget\\packages\\microsoft.aspnetcore.mvc.versioning\\5.1.0\\microsoft.aspnetcore.mvc.versioning.5.1.0.nupkg.sha512",
     "C:\\Users\\CW\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\6.0.0\\microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512",
     "C:\\Users\\CW\\.nuget\\packages\\microsoft.codeanalysis.analyzers\\3.3.3\\microsoft.codeanalysis.analyzers.3.3.3.nupkg.sha512",
     "C:\\Users\\CW\\.nuget\\packages\\microsoft.codeanalysis.common\\4.5.0\\microsoft.codeanalysis.common.4.5.0.nupkg.sha512",

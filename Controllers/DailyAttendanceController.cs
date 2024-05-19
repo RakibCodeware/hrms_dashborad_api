@@ -677,7 +677,12 @@ namespace Hrms_api.Controllers
 
                      else
                     {
-                        return Ok(new { NewJoin =0, Release =0});
+                     return Ok(new[] {
+                        new {
+                            newJoin = 0,
+                            release = 0
+                        }
+                    });
                     }
 
                 }
@@ -698,16 +703,22 @@ namespace Hrms_api.Controllers
 
         public IActionResult dailyOtCalculation(string date,string  companyId)
         {
-            string todate = date;
-            DateTime datetime = DateTime.Parse(date);
-            //convert the date first day off previous month
-            DateTime firstDayOfPreviousMonth = new DateTime(datetime.Year, datetime.Month, 1).AddMonths(-1);
-            string Formadate = firstDayOfPreviousMonth.ToString("yyyy-MM-dd");
-           
+            string cacheKey = $"{date}-{companyId}";
 
-            var results = overTimeCalculation(todate, todate, companyId);
-  
-            return Ok(results);
+            if (!_cache.TryGetValue(cacheKey, out var cachedResult))
+            {
+                DateTime datetime = DateTime.Parse(date);
+                DateTime firstDayOfPreviousMonth = new DateTime(datetime.Year, datetime.Month, 1).AddMonths(-1);
+                string formattedDate = firstDayOfPreviousMonth.ToString("yyyy-MM-dd");
+                var results = overTimeCalculation(date, date, companyId);
+                var cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(2));
+                _cache.Set(cacheKey, results, cacheEntryOptions);
+
+                return Ok(results);
+            }
+
+            // Cache entry found, return the cached result
+            return Ok(cachedResult);
         }
 
 
@@ -716,15 +727,25 @@ namespace Hrms_api.Controllers
 
         public IActionResult monthlyOtCalculation(string date,string companyId)
         {
-            string todate = date;
-            DateTime datetime = DateTime.Parse(date);
-            //convert the date first day off previous month
-            DateTime firstDayOfPreviousMonth = new DateTime(datetime.Year, datetime.Month, 1).AddMonths(-1);
-            string Formadate = firstDayOfPreviousMonth.ToString("yyyy-MM-dd");
+            string cacheKey = $"{date}-{companyId}";
 
+            if (!_cache.TryGetValue(cacheKey, out var cachedResult))
+            {
+                string todate = date;
+                DateTime datetime = DateTime.Parse(date);
+             
+                DateTime firstDayOfPreviousMonth = new DateTime(datetime.Year, datetime.Month, 1).AddMonths(-1);
+                string formattedDate = firstDayOfPreviousMonth.ToString("yyyy-MM-dd");
+                var results = overTimeCalculation(formattedDate, todate, companyId);
+                 var cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(2));
+                _cache.Set(cacheKey, results, cacheEntryOptions);
 
-            var results = overTimeCalculation(Formadate, todate, companyId);
-           return Ok(results);
+                return Ok(results);
+            }
+
+          
+            return Ok(cachedResult);
+
         }
 
 

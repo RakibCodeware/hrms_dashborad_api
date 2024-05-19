@@ -65,7 +65,7 @@ namespace Hrms_api.Controllers
                         DateTime date = DateTime.UtcNow.AddDays(30);
 
                         // Generate the token
-                        string _AccessToken = new JwtSecurityTokenHandler().WriteToken(token);
+                    string _AccessToken = new JwtSecurityTokenHandler().WriteToken(token);
                         List<UserInfo> userInfos = GetUserInformation(user.Username, user.Password, compayId);
                         // Return the token in the response
                         return Ok(new { AccessToken = _AccessToken,userInfos= userInfos });

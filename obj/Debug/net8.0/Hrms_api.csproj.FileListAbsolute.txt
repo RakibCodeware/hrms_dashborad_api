@@ -137,3 +137,4 @@ C:\Users\CW\Documents\Hrms_api\Hrms_api\obj\Debug\net8.0\ref\Hrms_api.dll
 C:\Users\CW\Documents\Hrms_api\Hrms_api\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 C:\Users\CW\Documents\Hrms_api\Hrms_api\obj\Debug\net8.0\Hrms_api.sourcelink.json
 C:\Users\CW\Documents\Hrms_api\Hrms_api\bin\Debug\net8.0\ComplexScriptingSystem.dll
+C:\Users\CW\Documents\Hrms_api\Hrms_api\bin\Debug\net8.0\Microsoft.AspNetCore.Mvc.Versioning.dll
